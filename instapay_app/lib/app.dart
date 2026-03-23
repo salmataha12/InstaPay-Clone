@@ -1,0 +1,110 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+/// IMPORT YOUR VIEWS
+import 'ui/views/onboarding/onboarding_view.dart';
+import 'ui/views/auth/signup_view.dart';
+import 'ui/views/auth/otp_view.dart';
+import 'ui/views/auth/create_account_view.dart';
+import 'ui/views/auth/biometric_view.dart';
+import 'ui/views/auth/bank_selection_view.dart';
+import 'ui/views/auth/card_link_view.dart';
+
+import 'ui/views/home/home_view.dart';
+import 'ui/views/more/more_view.dart';
+import 'ui/views/Bills/bills_view.dart';
+import 'ui/views/send/send_view.dart';
+
+import 'ui/widgets/main_navigation.dart';
+
+class InstaPayApp extends StatelessWidget {
+  const InstaPayApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final router = GoRouter(
+      initialLocation: '/home',
+
+      routes: [
+
+        GoRoute(
+          path: '/onboarding',
+          builder: (_, __) => const OnboardingView(),
+        ),
+        GoRoute(
+          path: '/signup',
+          builder: (_, __) => const SignUpView(),
+        ),
+        GoRoute(
+          path: '/otp',
+          builder: (_, __) => const OtpView(),
+        ),
+        GoRoute(
+          path: '/create-account',
+          builder: (_, __) => const CreateAccountView(),
+        ),
+        GoRoute(
+          path: '/biometric',
+          builder: (_, __) => const BiometricView(),
+        ),
+        GoRoute(
+          path: '/bank',
+          builder: (_, __) => const BankSelectionView(),
+        ),
+        GoRoute(
+          path: '/card',
+          builder: (_, __) => const CardLinkView(),
+        ),
+
+        ShellRoute(
+          builder: (context, state, child) {
+            return MainNavigation(child: child);
+          },
+          routes: [
+
+            /// HOME
+            GoRoute(
+              path: '/home',
+              builder: (_, __) => const HomeView(),
+            ),
+
+            
+            GoRoute(
+              path: '/send',
+              builder: (_, __) =>
+                  const SendView(),
+            ),
+
+            /// RECEIVE (placeholder)
+            GoRoute(
+              path: '/receive',
+              builder: (_, __) =>
+                  const Scaffold(body: Center(child: Text("Receive"))),
+            ),
+
+            /// BILLS 
+            GoRoute(
+              path: '/bills',
+              builder: (_, __) => const BillsView(),
+            ),
+
+            /// MORE
+            GoRoute(
+              path: '/more',
+              builder: (_, __) => const MoreView(),
+            ),
+          ],
+        ),
+      ],
+    );
+
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'InstaPay',
+      routerConfig: router,
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+      ),
+    );
+  }
+}
