@@ -28,7 +28,7 @@ class InstaPayApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      initialLocation: '/home',
+      initialLocation: '/onboarding',
 
       routes: [
         GoRoute(
