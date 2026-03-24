@@ -5,7 +5,7 @@ class TransactionsViewModel extends ChangeNotifier {
     {
       "amount": "50 EGP",
       "name": "mernataha178@instapay",
-      "maskedName": "ميرنا طه عبدالعليم العرابي حماد",
+      "maskedName": "MERNA TAHA",
       "type": "Received Money",
       "date": "19 Mar 2026 03:34 AM",
       "status": "Successful"
@@ -20,7 +20,7 @@ class TransactionsViewModel extends ChangeNotifier {
     },
     {
       "amount": "225 EGP",
-      "name": "ميرو حبيبتي ❤️❤️",
+      "name": "MERNA",
       "maskedName": "***ميرنا ط* ع****** ا******** ح",
       "type": "Send Money",
       "date": "19 Mar 2026 03:14 AM",
@@ -29,7 +29,7 @@ class TransactionsViewModel extends ChangeNotifier {
     {
       "amount": "580 EGP",
       "name": "mernataha178@instapay",
-      "maskedName": "ميرنا طه عبدالعليم العرابي حماد",
+      "maskedName": "MERNA TAHA",
       "type": "Received Money",
       "date": "11 Mar 2026 02:09 PM",
       "status": "Successful"

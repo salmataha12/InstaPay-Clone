@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/security/security_utils.dart';
 import 'send_viewmodel.dart';
 
 class SendView extends StatefulWidget {
@@ -22,13 +23,7 @@ class _SendViewState extends State<SendView> {
     Icons.account_balance_wallet,
   ];
 
-  final List<String> tabLabels = [
-    'Mobile',
-    'IPA',
-    'Bank',
-    'Card',
-    'Wallet',
-  ];
+  final List<String> tabLabels = ['Mobile', 'IPA', 'Bank', 'Card', 'Wallet'];
 
   int _currentPage = 0;
 
@@ -39,9 +34,9 @@ class _SendViewState extends State<SendView> {
   // ── FIX 2 & 3: Amount controllers per tab ────────────────────
   final TextEditingController _mobileAmountController = TextEditingController();
   final TextEditingController _walletAmountController = TextEditingController();
-  final TextEditingController _bankAmountController   = TextEditingController();
-  final TextEditingController _cardAmountController   = TextEditingController();
-  final TextEditingController _notesController        = TextEditingController();
+  final TextEditingController _bankAmountController = TextEditingController();
+  final TextEditingController _cardAmountController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
   String? _pickedContactName;
 
@@ -64,7 +59,6 @@ class _SendViewState extends State<SendView> {
     _notesController.dispose();
     super.dispose();
   }
-
 
   Future<void> _pickContact(TextEditingController controller) async {
     final granted = await FlutterContacts.requestPermission(readonly: true);
@@ -145,35 +139,42 @@ class _SendViewState extends State<SendView> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: const Color(0xFFEAEAEA)),
                         ),
-                        child: Row(children: [
-                          const Icon(Icons.search,
-                              color: Color(0xFFAAAAAA), size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: TextField(
-                              controller: searchController,
-                              decoration: const InputDecoration(
-                                hintText: "Search contacts...",
-                                hintStyle: TextStyle(
-                                    color: Color(0xFFBBBBBB), fontSize: 13),
-                                border: InputBorder.none,
-                                isDense: true,
-                              ),
-                              onChanged: (val) {
-                                setModalState(() {
-                                  filtered = contacts.where((c) {
-                                    final name = c.displayName.toLowerCase();
-                                    final phone = c.phones.isNotEmpty
-                                        ? c.phones.first.number
-                                        : '';
-                                    return name.contains(val.toLowerCase()) ||
-                                        phone.contains(val);
-                                  }).toList();
-                                });
-                              },
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.search,
+                              color: Color(0xFFAAAAAA),
+                              size: 20,
                             ),
-                          ),
-                        ]),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextField(
+                                controller: searchController,
+                                decoration: const InputDecoration(
+                                  hintText: "Search contacts...",
+                                  hintStyle: TextStyle(
+                                    color: Color(0xFFBBBBBB),
+                                    fontSize: 13,
+                                  ),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                ),
+                                onChanged: (val) {
+                                  setModalState(() {
+                                    filtered = contacts.where((c) {
+                                      final name = c.displayName.toLowerCase();
+                                      final phone = c.phones.isNotEmpty
+                                          ? c.phones.first.number
+                                          : '';
+                                      return name.contains(val.toLowerCase()) ||
+                                          phone.contains(val);
+                                    }).toList();
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 
@@ -183,15 +184,19 @@ class _SendViewState extends State<SendView> {
                     Expanded(
                       child: filtered.isEmpty
                           ? const Center(
-                              child: Text("No contacts found",
-                                  style: TextStyle(color: Colors.grey)))
+                              child: Text(
+                                "No contacts found",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
                           : ListView.separated(
                               controller: scrollController,
                               itemCount: filtered.length,
                               separatorBuilder: (_, __) => const Divider(
-                                  height: 1,
-                                  indent: 68,
-                                  color: Color(0xFFF0F0F0)),
+                                height: 1,
+                                indent: 68,
+                                color: Color(0xFFF0F0F0),
+                              ),
                               itemBuilder: (context, i) {
                                 final contact = filtered[i];
                                 final name = contact.displayName;
@@ -200,21 +205,25 @@ class _SendViewState extends State<SendView> {
                                     : '';
 
                                 // FIX 4: Format number on contact pick
-                                final cleanPhone =
-                                    _formatEgyptianNumber(phone);
+                                final cleanPhone = _formatEgyptianNumber(phone);
 
                                 return ListTile(
                                   contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 4),
+                                    horizontal: 20,
+                                    vertical: 4,
+                                  ),
                                   leading: CircleAvatar(
                                     radius: 22,
-                                    backgroundColor: const Color(0xFF7B2FF7)
-                                        .withOpacity(0.12),
-                                    backgroundImage: contact.photo != null &&
+                                    backgroundColor: const Color(
+                                      0xFF7B2FF7,
+                                    ).withOpacity(0.12),
+                                    backgroundImage:
+                                        contact.photo != null &&
                                             contact.photo!.isNotEmpty
                                         ? MemoryImage(contact.photo!)
                                         : null,
-                                    child: (contact.photo == null ||
+                                    child:
+                                        (contact.photo == null ||
                                             contact.photo!.isEmpty)
                                         ? Text(
                                             name.isNotEmpty
@@ -228,16 +237,22 @@ class _SendViewState extends State<SendView> {
                                           )
                                         : null,
                                   ),
-                                  title: Text(name,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF1A1A1A))),
+                                  title: Text(
+                                    name,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF1A1A1A),
+                                    ),
+                                  ),
                                   subtitle: phone.isNotEmpty
-                                      ? Text(phone,
+                                      ? Text(
+                                          phone,
                                           style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Color(0xFF888888)))
+                                            fontSize: 12,
+                                            color: Color(0xFF888888),
+                                          ),
+                                        )
                                       : null,
                                   onTap: () {
                                     // FIX 4: store formatted number
@@ -247,11 +262,13 @@ class _SendViewState extends State<SendView> {
                                     setState(() {
                                       if (controller == _mobileController) {
                                         _mobileError = null;
-                                        _pickedContactName = name; // <-- store name
+                                        _pickedContactName =
+                                            name; // <-- store name
                                       } else if (controller ==
                                           _walletController) {
                                         _walletError = null;
-                                        _pickedContactName = name; // <-- store name
+                                        _pickedContactName =
+                                            name; // <-- store name
                                       }
                                     });
                                   },
@@ -269,7 +286,6 @@ class _SendViewState extends State<SendView> {
     );
   }
 
-
   String _formatEgyptianNumber(String number) {
     number = number.replaceAll(RegExp(r'[^0-9+]'), '');
 
@@ -282,7 +298,6 @@ class _SendViewState extends State<SendView> {
     return number;
   }
 
-
   String? _validateMobile(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Mobile number is required';
@@ -294,13 +309,12 @@ class _SendViewState extends State<SendView> {
     return null;
   }
 
-
   String? _validateAmount(String? value) {
     if (value == null || value.trim().isEmpty) return 'Amount is required';
     final amount = double.tryParse(value);
-    if (amount == null)   return 'Enter a valid number';
-    if (amount <= 0)      return 'Amount must be greater than zero';
-    if (amount > 100000)  return 'Exceeds max limit (100,000 EGP)';
+    if (amount == null) return 'Enter a valid number';
+    if (amount <= 0) return 'Amount must be greater than zero';
+    if (amount > 100000) return 'Exceeds max limit (100,000 EGP)';
     return null;
   }
 
@@ -313,7 +327,7 @@ class _SendViewState extends State<SendView> {
         final mErr = _validateMobile(_mobileController.text);
         final aErr = _validateAmount(_mobileAmountController.text);
         setState(() {
-          _mobileError       = mErr;
+          _mobileError = mErr;
           _mobileAmountError = aErr;
         });
         valid = mErr == null && aErr == null;
@@ -323,7 +337,7 @@ class _SendViewState extends State<SendView> {
         final wErr = _validateMobile(_walletController.text);
         final aErr = _validateAmount(_walletAmountController.text);
         setState(() {
-          _walletError       = wErr;
+          _walletError = wErr;
           _walletAmountError = aErr;
         });
         valid = wErr == null && aErr == null;
@@ -344,9 +358,11 @@ class _SendViewState extends State<SendView> {
 
     if (!valid) return;
 
-    // FIX 4: format before passing forward
+    // FIX 4: format and sanitize before passing forward
     final typeMap = {0: 'Mobile', 1: 'IPA', 2: 'Bank', 3: 'Card', 4: 'Wallet'};
-    String accountType = typeMap[viewModel.selectedTab] ?? 'Unknown';
+    final accountType = SecurityUtils.sanitizeInput(
+      typeMap[viewModel.selectedTab] ?? 'Unknown',
+    );
     String recipient = '';
     String amount = '';
 
@@ -360,7 +376,7 @@ class _SendViewState extends State<SendView> {
         amount = _walletAmountController.text;
         break;
       case 2:
-        recipient = "Bank Account Details (Hidden)"; // Depending on how you structured Bank inputs
+        recipient = "Bank Account Details (Hidden)";
         amount = _bankAmountController.text;
         break;
       case 3:
@@ -369,15 +385,28 @@ class _SendViewState extends State<SendView> {
         break;
     }
 
+    // Additional numeric safety check
+    if (!SecurityUtils.isValidAmount(amount)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Invalid amount detected')));
+      return;
+    }
+
     // Push the confirmation route
-    context.push('/send_confirmation', extra: {
-      'type': accountType,
-      'recipient': recipient,
-      'recipientName': _pickedContactName ?? 'InstaPay User',
-      'amount': amount,
-      'reason': _selectedReason,
-      'notes': _notesController.text,
-    });
+    context.push(
+      '/send_confirmation',
+      extra: {
+        'type': accountType,
+        'recipient': SecurityUtils.sanitizeInput(recipient),
+        'recipientName': SecurityUtils.sanitizeInput(
+          _pickedContactName ?? 'InstaPay User',
+        ),
+        'amount': SecurityUtils.sanitizeInput(amount),
+        'reason': SecurityUtils.sanitizeInput(_selectedReason),
+        'notes': SecurityUtils.sanitizeInput(_notesController.text),
+      },
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -412,7 +441,6 @@ class _SendViewState extends State<SendView> {
     );
   }
 
-
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
@@ -432,8 +460,7 @@ class _SendViewState extends State<SendView> {
                   Color(0xFFB06EF8),
                 ],
               ),
-              borderRadius:
-                  BorderRadius.vertical(bottom: Radius.circular(32)),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
             ),
           ),
           Positioned(
@@ -505,39 +532,52 @@ class _SendViewState extends State<SendView> {
                 color: const Color(0xFF1B7A3E),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.account_balance,
-                  color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.account_balance,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("From",
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w400)),
+                  Text(
+                    "From",
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                   SizedBox(height: 3),
                   Text(
-                    "hanan_elsayed2710@instapay",
+                    "salmataha12@instapay",
                     style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1A1A1A)),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 2),
-                  Text("SAVING",
-                      style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey,
-                          letterSpacing: 0.5)),
+                  Text(
+                    "SAVING",
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.keyboard_arrow_down_rounded,
-                color: Colors.grey, size: 22),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Colors.grey,
+              size: 22,
+            ),
           ],
         ),
       ),
@@ -589,24 +629,36 @@ class _SendViewState extends State<SendView> {
                         ? "Send Money To"
                         : "Send Money To My Accounts",
                     style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: Color(0xFF1A1A1A)),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Color(0xFF1A1A1A),
+                    ),
                   ),
                   if (_currentPage == 0)
-                    Row(children: const [
-                      Icon(Icons.star_border_rounded,
-                          size: 16, color: Color(0xFFFF8C42)),
-                      SizedBox(width: 4),
-                      Text("Favorites",
+                    Row(
+                      children: const [
+                        Icon(
+                          Icons.star_border_rounded,
+                          size: 16,
+                          color: Color(0xFFFF8C42),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          "Favorites",
                           style: TextStyle(
-                              color: Color(0xFFFF8C42),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500)),
-                      SizedBox(width: 2),
-                      Icon(Icons.chevron_right,
-                          size: 16, color: Color(0xFFFF8C42)),
-                    ]),
+                            color: Color(0xFFFF8C42),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(width: 2),
+                        Icon(
+                          Icons.chevron_right,
+                          size: 16,
+                          color: Color(0xFFFF8C42),
+                        ),
+                      ],
+                    ),
                 ],
               ),
 
@@ -661,33 +713,39 @@ class _SendViewState extends State<SendView> {
                   viewModel.selectTab(index);
                   _bankSubTab = 0;
                 }),
-                child: Column(children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFF7B2FF7)
-                          : const Color(0xFFF1F1F1),
-                      shape: BoxShape.circle,
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFF7B2FF7).withOpacity(0.35),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              )
-                            ]
-                          : [],
-                    ),
-                    child: Icon(icons[index],
+                child: Column(
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFF7B2FF7)
+                            : const Color(0xFFF1F1F1),
+                        shape: BoxShape.circle,
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF7B2FF7,
+                                  ).withOpacity(0.35),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Icon(
+                        icons[index],
                         size: 21,
                         color: isSelected
                             ? Colors.white
-                            : const Color(0xFF888888)),
-                  ),
-                ]),
+                            : const Color(0xFF888888),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           }),
@@ -695,23 +753,25 @@ class _SendViewState extends State<SendView> {
 
         const SizedBox(height: 6),
 
-        Stack(children: [
-          Container(height: 3, color: const Color(0xFFF0F0F0)),
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeInOut,
-            left: itemWidth * viewModel.selectedTab + (itemWidth - 28) / 2,
-            top: 0,
-            child: Container(
-              width: 28,
-              height: 3,
-              decoration: BoxDecoration(
-                color: const Color(0xFF7B2FF7),
-                borderRadius: BorderRadius.circular(10),
+        Stack(
+          children: [
+            Container(height: 3, color: const Color(0xFFF0F0F0)),
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeInOut,
+              left: itemWidth * viewModel.selectedTab + (itemWidth - 28) / 2,
+              top: 0,
+              child: Container(
+                width: 28,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7B2FF7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
-          ),
-        ]),
+          ],
+        ),
 
         const SizedBox(height: 16),
 
@@ -726,7 +786,7 @@ class _SendViewState extends State<SendView> {
     );
   }
 
-  // ── PAGE 2 — unchanged 
+  // ── PAGE 2 — unchanged
   Widget _buildMyAccountsPage() {
     return Center(
       child: Padding(
@@ -751,9 +811,12 @@ class _SendViewState extends State<SendView> {
                 foregroundColor: const Color(0xFFFF8C42),
                 side: const BorderSide(color: Color(0xFFFF8C42), width: 1.5),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 10,
+                ),
               ),
               child: const Text(
                 "Add Bank Account",
@@ -766,36 +829,51 @@ class _SendViewState extends State<SendView> {
     );
   }
 
-
   Widget _buildTabContent(int tab) {
     switch (tab) {
-      case 0:  return _buildMobileContent();
-      case 1:  return _buildIpaContent();
-      case 2:  return _buildBankContent();
-      case 3:  return _buildCardContent();
-      case 4:  return _buildWalletContent();
-      default: return _buildMobileContent();
+      case 0:
+        return _buildMobileContent();
+      case 1:
+        return _buildIpaContent();
+      case 2:
+        return _buildBankContent();
+      case 3:
+        return _buildCardContent();
+      case 4:
+        return _buildWalletContent();
+      default:
+        return _buildMobileContent();
     }
   }
 
   Widget _tabLabel(String text, {bool showHelp = true}) {
-    return Row(children: [
-      Text(text,
+    return Row(
+      children: [
+        Text(
+          text,
           style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-              color: Color(0xFF7B2FF7))),
-      const Spacer(),
-      if (showHelp)
-        Container(
-          width: 22,
-          height: 22,
-          decoration: const BoxDecoration(
-              color: Color(0xFFEEEEEE), shape: BoxShape.circle),
-          child: const Icon(Icons.question_mark_rounded,
-              size: 13, color: Colors.grey),
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+            color: Color(0xFF7B2FF7),
+          ),
         ),
-    ]);
+        const Spacer(),
+        if (showHelp)
+          Container(
+            width: 22,
+            height: 22,
+            decoration: const BoxDecoration(
+              color: Color(0xFFEEEEEE),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.question_mark_rounded,
+              size: 13,
+              color: Colors.grey,
+            ),
+          ),
+      ],
+    );
   }
 
   Widget _inputBox({
@@ -813,24 +891,28 @@ class _SendViewState extends State<SendView> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFEAEAEA)),
       ),
-      child: Row(children: [
-        if (prefix != null) ...[prefix, const SizedBox(width: 8)],
-        Expanded(
-          child: TextField(
-            keyboardType: keyboardType,
-            inputFormatters: inputFormatters,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A1A)),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle:
-                  const TextStyle(color: Color(0xFFBBBBBB), fontSize: 13),
-              border: InputBorder.none,
-              isDense: true,
+      child: Row(
+        children: [
+          if (prefix != null) ...[prefix, const SizedBox(width: 8)],
+          Expanded(
+            child: TextField(
+              keyboardType: keyboardType,
+              inputFormatters: inputFormatters,
+              style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A1A)),
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: const TextStyle(
+                  color: Color(0xFFBBBBBB),
+                  fontSize: 13,
+                ),
+                border: InputBorder.none,
+                isDense: true,
+              ),
             ),
           ),
-        ),
-        if (suffix != null) suffix,
-      ]),
+          if (suffix != null) suffix,
+        ],
+      ),
     );
   }
 
@@ -841,9 +923,9 @@ class _SendViewState extends State<SendView> {
     TextInputType keyboardType = TextInputType.text,
     Widget? suffix,
     Widget? prefix,
-    List<TextInputFormatter>? inputFormatters, 
-    String? errorText,                         
-    ValueChanged<String>? onChanged,         
+    List<TextInputFormatter>? inputFormatters,
+    String? errorText,
+    ValueChanged<String>? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -863,27 +945,33 @@ class _SendViewState extends State<SendView> {
                   : const Color(0xFFEAEAEA),
             ),
           ),
-          child: Row(children: [
-            if (prefix != null) ...[prefix, const SizedBox(width: 8)],
-            Expanded(
-              child: TextField(
-                controller: controller,
-                keyboardType: keyboardType,
-                inputFormatters: inputFormatters,
-                onChanged: onChanged,
-                style:
-                    const TextStyle(fontSize: 14, color: Color(0xFF1A1A1A)),
-                decoration: InputDecoration(
-                  hintText: hint,
-                  hintStyle: const TextStyle(
-                      color: Color(0xFFBBBBBB), fontSize: 13),
-                  border: InputBorder.none,
-                  isDense: true,
+          child: Row(
+            children: [
+              if (prefix != null) ...[prefix, const SizedBox(width: 8)],
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  keyboardType: keyboardType,
+                  inputFormatters: inputFormatters,
+                  onChanged: onChanged,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: const TextStyle(
+                      color: Color(0xFFBBBBBB),
+                      fontSize: 13,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                  ),
                 ),
               ),
-            ),
-            if (suffix != null) suffix,
-          ]),
+              if (suffix != null) suffix,
+            ],
+          ),
         ),
         // FIX 2: show error below field
         if (errorText != null)
@@ -921,35 +1009,46 @@ class _SendViewState extends State<SendView> {
                   : const Color(0xFFEAEAEA),
             ),
           ),
-          child: Row(children: [
-            Expanded(
-              child: TextField(
-                controller: controller,
-                // FIX 3: numeric keyboard, no minus sign
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                      RegExp(r'^\d+\.?\d{0,2}')),
-                ],
-                onChanged: onChanged,
-                style:
-                    const TextStyle(fontSize: 14, color: Color(0xFF1A1A1A)),
-                decoration: const InputDecoration(
-                  hintText: "Amount",
-                  hintStyle:
-                      TextStyle(color: Color(0xFFBBBBBB), fontSize: 13),
-                  border: InputBorder.none,
-                  isDense: true,
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  // FIX 3: numeric keyboard, no minus sign
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d+\.?\d{0,2}'),
+                    ),
+                  ],
+                  onChanged: onChanged,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: "Amount",
+                    hintStyle: TextStyle(
+                      color: Color(0xFFBBBBBB),
+                      fontSize: 13,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                  ),
                 ),
               ),
-            ),
-            const Text("EGP",
+              const Text(
+                "EGP",
                 style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF888888))),
-          ]),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF888888),
+                ),
+              ),
+            ],
+          ),
         ),
         // FIX 3: show error below amount
         if (errorText != null)
@@ -964,7 +1063,6 @@ class _SendViewState extends State<SendView> {
     );
   }
 
-
   Widget _buildMobileContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -975,7 +1073,9 @@ class _SendViewState extends State<SendView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: _pickedContactName != null && _mobileController.text.isNotEmpty
+              child:
+                  _pickedContactName != null &&
+                      _mobileController.text.isNotEmpty
                   ? Container(
                       height: 54,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -991,17 +1091,24 @@ class _SendViewState extends State<SendView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(_pickedContactName!,
-                                    style: const TextStyle(
-                                        fontSize: 11, color: Color(0xFF666666)),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis),
+                                Text(
+                                  _pickedContactName!,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFF666666),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                                 const SizedBox(height: 2),
-                                Text(_mobileController.text,
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0xFF1A1A1A),
-                                        fontWeight: FontWeight.w500)),
+                                Text(
+                                  _mobileController.text,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF1A1A1A),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -1016,10 +1123,16 @@ class _SendViewState extends State<SendView> {
                               padding: const EdgeInsets.all(2),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0xFFFF8C42), width: 1.5),
+                                border: Border.all(
+                                  color: const Color(0xFFFF8C42),
+                                  width: 1.5,
+                                ),
                               ),
-                              child: const Icon(Icons.close,
-                                  color: Color(0xFFFF8C42), size: 14),
+                              child: const Icon(
+                                Icons.close,
+                                color: Color(0xFFFF8C42),
+                                size: 14,
+                              ),
                             ),
                           ),
                         ],
@@ -1052,8 +1165,10 @@ class _SendViewState extends State<SendView> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: const Color(0xFFEAEAEA)),
                 ),
-                child: const Icon(Icons.person_outline_rounded,
-                    color: Color(0xFF1A1A1A)),
+                child: const Icon(
+                  Icons.person_outline_rounded,
+                  color: Color(0xFF1A1A1A),
+                ),
               ),
             ),
           ],
@@ -1067,7 +1182,6 @@ class _SendViewState extends State<SendView> {
       ],
     );
   }
-
 
   Widget _buildIpaContent() {
     return Column(
@@ -1088,8 +1202,7 @@ class _SendViewState extends State<SendView> {
           "To send money using a payment address, use the "
           "beneficiary's payment link, scan their QR code, or "
           "choose from favorites.",
-          style: TextStyle(
-              fontSize: 12, color: Color(0xFF888888), height: 1.6),
+          style: TextStyle(fontSize: 12, color: Color(0xFF888888), height: 1.6),
           textAlign: TextAlign.center,
         ),
       ],
@@ -1114,11 +1227,13 @@ class _SendViewState extends State<SendView> {
       children: [
         _tabLabel("Bank Account", showHelp: false),
         const SizedBox(height: 12),
-        Row(children: [
-          _bankSubTabBtn("Account NO.", 0),
-          const SizedBox(width: 24),
-          _bankSubTabBtn("IBAN NO.", 1),
-        ]),
+        Row(
+          children: [
+            _bankSubTabBtn("Account NO.", 0),
+            const SizedBox(width: 24),
+            _bankSubTabBtn("IBAN NO.", 1),
+          ],
+        ),
         const SizedBox(height: 14),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
@@ -1137,95 +1252,115 @@ class _SendViewState extends State<SendView> {
     final active = _bankSubTab == index;
     return GestureDetector(
       onTap: () => setState(() => _bankSubTab = index),
-      child: Column(children: [
-        Text(label,
+      child: Column(
+        children: [
+          Text(
+            label,
             style: TextStyle(
               fontSize: 13,
               fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-              color: active
-                  ? const Color(0xFFFF8C42)
-                  : const Color(0xFF888888),
-            )),
-        const SizedBox(height: 4),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          height: 2,
-          width: active ? label.length * 7.5 : 0,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFF8C42),
-            borderRadius: BorderRadius.circular(2),
+              color: active ? const Color(0xFFFF8C42) : const Color(0xFF888888),
+            ),
           ),
-        ),
-      ]),
+          const SizedBox(height: 4),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 2,
+            width: active ? label.length * 7.5 : 0,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF8C42),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildBankAccountContent() {
-    return Column(children: [
-      Container(
-        height: 48,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF7F7F7),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFEAEAEA)),
-        ),
-        child: Row(children: const [
-          Expanded(
-            child: Text("Select Bank",
-                style:
-                    TextStyle(color: Color(0xFFBBBBBB), fontSize: 13)),
+    return Column(
+      children: [
+        Container(
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F7F7),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFEAEAEA)),
           ),
-          Icon(Icons.keyboard_arrow_down_rounded,
-              color: Colors.grey, size: 20),
-        ]),
-      ),
-      const SizedBox(height: 10),
-      // FIX 2: digits only for account number
-      _inputBox(
-        hint: "Account Number",
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        suffix: Icon(Icons.assignment_outlined,
-            size: 20, color: Colors.orange.shade400),
-      ),
-      const SizedBox(height: 10),
-      _inputBox(hint: "Receiver name"),
-      const SizedBox(height: 10),
-      // FIX 3: validated amount
-      _amountInputControlled(
-        controller: _bankAmountController,
-        errorText: _bankAmountError,
-        onChanged: (_) => setState(() => _bankAmountError = null),
-      ),
-    ]);
+          child: Row(
+            children: const [
+              Expanded(
+                child: Text(
+                  "Select Bank",
+                  style: TextStyle(color: Color(0xFFBBBBBB), fontSize: 13),
+                ),
+              ),
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: Colors.grey,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        // FIX 2: digits only for account number
+        _inputBox(
+          hint: "Account Number",
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          suffix: Icon(
+            Icons.assignment_outlined,
+            size: 20,
+            color: Colors.orange.shade400,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _inputBox(hint: "Receiver name"),
+        const SizedBox(height: 10),
+        // FIX 3: validated amount
+        _amountInputControlled(
+          controller: _bankAmountController,
+          errorText: _bankAmountError,
+          onChanged: (_) => setState(() => _bankAmountError = null),
+        ),
+      ],
+    );
   }
 
   Widget _buildIbanContent() {
-    return Column(children: [
-      _inputBox(
-        hint: "IBAN no.",
-        keyboardType: TextInputType.text,
-        prefix: const Text("EG",
+    return Column(
+      children: [
+        _inputBox(
+          hint: "IBAN no.",
+          keyboardType: TextInputType.text,
+          prefix: const Text(
+            "EG",
             style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A1A1A),
-                fontSize: 14)),
-        suffix: Icon(Icons.assignment_outlined,
-            size: 20, color: Colors.orange.shade400),
-      ),
-      const SizedBox(height: 10),
-      _inputBox(hint: "Receiver name"),
-      const SizedBox(height: 10),
-      // FIX 3: validated amount
-      _amountInputControlled(
-        controller: _bankAmountController,
-        errorText: _bankAmountError,
-        onChanged: (_) => setState(() => _bankAmountError = null),
-      ),
-    ]);
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1A1A1A),
+              fontSize: 14,
+            ),
+          ),
+          suffix: Icon(
+            Icons.assignment_outlined,
+            size: 20,
+            color: Colors.orange.shade400,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _inputBox(hint: "Receiver name"),
+        const SizedBox(height: 10),
+        // FIX 3: validated amount
+        _amountInputControlled(
+          controller: _bankAmountController,
+          errorText: _bankAmountError,
+          onChanged: (_) => setState(() => _bankAmountError = null),
+        ),
+      ],
+    );
   }
-
 
   Widget _buildCardContent() {
     return Column(
@@ -1241,8 +1376,11 @@ class _SendViewState extends State<SendView> {
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(16),
           ],
-          suffix: Icon(Icons.assignment_outlined,
-              size: 20, color: Colors.orange.shade400),
+          suffix: Icon(
+            Icons.assignment_outlined,
+            size: 20,
+            color: Colors.orange.shade400,
+          ),
         ),
         const SizedBox(height: 10),
         _inputBox(hint: "Card Holder Name"),
@@ -1256,7 +1394,6 @@ class _SendViewState extends State<SendView> {
       ],
     );
   }
-
 
   Widget _buildWalletContent() {
     return Column(
@@ -1274,16 +1411,25 @@ class _SendViewState extends State<SendView> {
           ],
           errorText: _walletError,
           onChanged: (_) => setState(() => _walletError = null),
-          suffix: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.assignment_outlined,
-                size: 20, color: Colors.orange.shade400),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () => _pickContact(_walletController),
-              child: const Icon(Icons.person_outline_rounded,
-                  size: 20, color: Color(0xFFAAAAAA)),
-            ),
-          ]),
+          suffix: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.assignment_outlined,
+                size: 20,
+                color: Colors.orange.shade400,
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => _pickContact(_walletController),
+                child: const Icon(
+                  Icons.person_outline_rounded,
+                  size: 20,
+                  color: Color(0xFFAAAAAA),
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 10),
         // FIX 3: validated amount
@@ -1295,7 +1441,6 @@ class _SendViewState extends State<SendView> {
       ],
     );
   }
-
 
   Widget _buildAddReason() {
     return Padding(
@@ -1309,8 +1454,7 @@ class _SendViewState extends State<SendView> {
               height: 22,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border:
-                    Border.all(color: Colors.orange.shade400, width: 1.5),
+                border: Border.all(color: Colors.orange.shade400, width: 1.5),
               ),
               child: Icon(Icons.add, size: 14, color: Colors.orange.shade400),
             ),
@@ -1377,9 +1521,10 @@ class _SendViewState extends State<SendView> {
                   const Text(
                     "Reason for transfer",
                     style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A1A)),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A1A1A),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Container(
@@ -1393,20 +1538,23 @@ class _SendViewState extends State<SendView> {
                       child: DropdownButton<String>(
                         isExpanded: true,
                         value: tempReason,
-                        icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                            color: Colors.grey),
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Colors.grey,
+                        ),
                         style: const TextStyle(
-                            fontSize: 14, color: Color(0xFF1A1A1A)),
+                          fontSize: 14,
+                          color: Color(0xFF1A1A1A),
+                        ),
                         onChanged: (val) {
                           if (val != null) {
                             setModalState(() => tempReason = val);
                           }
                         },
                         items: _reasons
-                            .map((r) => DropdownMenuItem(
-                                  value: r,
-                                  child: Text(r),
-                                ))
+                            .map(
+                              (r) => DropdownMenuItem(value: r, child: Text(r)),
+                            )
                             .toList(),
                       ),
                     ),
@@ -1428,7 +1576,9 @@ class _SendViewState extends State<SendView> {
                       decoration: const InputDecoration(
                         hintText: "Notes",
                         hintStyle: TextStyle(
-                            color: Color(0xFFBBBBBB), fontSize: 13),
+                          color: Color(0xFFBBBBBB),
+                          fontSize: 13,
+                        ),
                         border: InputBorder.none,
                         isDense: true,
                       ),
@@ -1446,15 +1596,17 @@ class _SendViewState extends State<SendView> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7B2FF7),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25)),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
                         elevation: 0,
                       ),
                       child: const Text(
                         "Confirm",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
                       ),
                     ),
                   ),

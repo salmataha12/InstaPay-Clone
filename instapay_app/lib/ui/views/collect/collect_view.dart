@@ -507,7 +507,7 @@ class _CollectViewState extends State<CollectView> {
                           fontWeight: FontWeight.w400)),
                   SizedBox(height: 3),
                   Text(
-                    "hanan_elsayed2710@instapay",
+                    "salmataha12@instapay",
                     style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

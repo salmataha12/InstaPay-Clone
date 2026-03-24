@@ -5,7 +5,7 @@ import 'ui/views/onboarding/onboarding_view.dart';
 import 'ui/views/auth/signup_view.dart';
 import 'ui/views/auth/otp_view.dart';
 import 'ui/views/auth/create_account_view.dart';
-import 'ui/views/auth/biometric_view.dart';
+import 'package:instapay_app/ui/views/auth/biometric_view.dart';
 import 'ui/views/auth/bank_selection_view.dart';
 import 'ui/views/auth/card_link_view.dart';
 
@@ -41,7 +41,16 @@ class InstaPayApp extends StatelessWidget {
           path: '/create-account',
           builder: (_, __) => const CreateAccountView(),
         ),
-        GoRoute(path: '/biometric', builder: (_, __) => const BiometricView()),
+        GoRoute(
+          path: '/biometric',
+          builder: (context, state) {
+            final data = state.extra as Map<String, dynamic>?;
+            return BiometricView(
+              nextRoute: data?['nextRoute'] as String?,
+              nextData: data?['nextData'] as Map<String, dynamic>?,
+            );
+          },
+        ),
         GoRoute(path: '/bank', builder: (_, __) => const BankSelectionView()),
         GoRoute(path: '/card', builder: (_, __) => const CardLinkView()),
 
@@ -61,7 +70,10 @@ class InstaPayApp extends StatelessWidget {
             /// BILLS
             GoRoute(path: '/bills', builder: (_, __) => const BillsView()),
 
-            GoRoute(path: '/telecom_bills', builder: (_, __) => const TelecomBillsView()),
+            GoRoute(
+              path: '/telecom_bills',
+              builder: (_, __) => const TelecomBillsView(),
+            ),
 
             /// MORE
             GoRoute(path: '/more', builder: (_, __) => const MoreView()),

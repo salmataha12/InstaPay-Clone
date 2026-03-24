@@ -5,7 +5,7 @@ class HomeViewModel extends ChangeNotifier {
   /// USER DATA (mock now → backend later)
   String userName = "Salma Taha";
   String account = "salmataha12@instapay";
-  String accountType = "SAVING XXXXX180";
+  String accountType = "SAVING XXXXX242";
 
   /// GREETING BASED ON TIME
   String getGreeting() {
@@ -37,7 +37,7 @@ class HomeViewModel extends ChangeNotifier {
     {
       "amount": "50 EGP",
       "name": "mernataha178@instapay",
-      "maskedName": "ميرنا طه عبدالعليم العرابي حماد",
+      "maskedName":"MERNA TAHA",
       "type": "Received Money",
       "date": "19 Mar 2026 03:34 AM",
       "status": "Successful"

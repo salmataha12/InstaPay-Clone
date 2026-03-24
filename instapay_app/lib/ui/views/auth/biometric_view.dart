@@ -1,22 +1,29 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'biometric_viewmodel.dart';
 import 'package:go_router/go_router.dart';
 
+import 'biometric_viewmodel.dart';
+
 class BiometricView extends StatelessWidget {
-  const BiometricView({super.key});
+  final String? nextRoute;
+  final Map<String, dynamic>? nextData;
+
+  const BiometricView({super.key, this.nextRoute, this.nextData});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => BiometricViewModel()..checkBiometricAvailability(),
-      child: const _BiometricBody(),
+      child: _BiometricBody(nextRoute: nextRoute, nextData: nextData),
     );
   }
 }
 
 class _BiometricBody extends StatelessWidget {
-  const _BiometricBody();
+  final String? nextRoute;
+  final Map<String, dynamic>? nextData;
+
+  const _BiometricBody({this.nextRoute, this.nextData});
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +34,12 @@ class _BiometricBody extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-
             const SizedBox(height: 20),
-
             const Text(
               "Welcome to",
               style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
-
             const SizedBox(height: 6),
-
             const Text(
               "INSTAPAY",
               style: TextStyle(
@@ -45,28 +48,21 @@ class _BiometricBody extends StatelessWidget {
                 color: Color(0xFF5A2D82),
               ),
             ),
-
             const SizedBox(height: 60),
-
-            /// ICONS
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: const [
                 Icon(Icons.fingerprint, size: 80, color: Color(0xFFFF7A00)),
                 Icon(Icons.face, size: 80, color: Color(0xFFFF7A00)),
-            ],
+              ],
             ),
-
             const SizedBox(height: 40),
-
             const Text(
               "Your Safety and Security is Always Important",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
-
             const SizedBox(height: 10),
-
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 30),
               child: Text(
@@ -75,10 +71,7 @@ class _BiometricBody extends StatelessWidget {
                 style: TextStyle(color: Colors.grey),
               ),
             ),
-
             const Spacer(),
-
-            /// FALLBACK PIN INPUT
             if (!vm.isBiometricAvailable)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -87,7 +80,10 @@ class _BiometricBody extends StatelessWidget {
                     const Text(
                       "Biometric not available. Please enter your 6-digit PIN:",
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 15),
                     TextField(
@@ -110,19 +106,23 @@ class _BiometricBody extends StatelessWidget {
                   ],
                 ),
               ),
-
-            /// BUTTON
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
               child: GestureDetector(
                 onTap: vm.isAuthenticating
                     ? null
                     : () async {
-
                         bool success = await vm.authenticate();
-
                         if (success) {
-                          context.go('/bank');
+                          if (nextRoute != null) {
+                            if (nextData != null) {
+                              context.push(nextRoute!, extra: nextData);
+                            } else {
+                              context.push(nextRoute!);
+                            }
+                          } else {
+                            context.go('/bank');
+                          }
                         } else if (vm.errorMsg == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -135,10 +135,7 @@ class _BiometricBody extends StatelessWidget {
                   height: 60,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF7B2FF7),
-                        Color(0xFF5A2D82),
-                      ],
+                      colors: [Color(0xFF7B2FF7), Color(0xFF5A2D82)],
                     ),
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -152,7 +149,7 @@ class _BiometricBody extends StatelessWidget {
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

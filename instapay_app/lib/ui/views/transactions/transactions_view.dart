@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'transactions_viewmodel.dart';
 import '../../widgets/transaction_tile.dart';
+import '../../../core/session/app_session.dart';
 
 class TransactionsView extends StatelessWidget {
   const TransactionsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TransactionsViewModel(),
-      child: const _TransactionsBody(),
-    );
+    return const _TransactionsBody();
   }
 }
 
@@ -20,12 +17,15 @@ class _TransactionsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.watch<TransactionsViewModel>();
+    final session = context.watch<AppSession>();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Transactions History', style: TextStyle(color: Colors.black, fontSize: 16)),
+        title: const Text(
+          'Transactions History',
+          style: TextStyle(color: Colors.black, fontSize: 16),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -33,9 +33,9 @@ class _TransactionsBody extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.only(top: 8, bottom: 40),
-        itemCount: vm.transactions.length,
+        itemCount: session.transactions.length,
         itemBuilder: (context, index) {
-          final tx = vm.transactions[index];
+          final tx = session.transactions[index];
           return TransactionTile(tx: tx, showBackground: false);
         },
       ),

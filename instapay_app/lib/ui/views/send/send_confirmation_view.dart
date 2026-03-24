@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/security/security_utils.dart';
 import '../../../core/session/app_session.dart';
 
 class SendConfirmationView extends StatefulWidget {
@@ -22,15 +23,29 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
     final fees = 0.5;
     final total = amount + fees;
 
-    final recipient = widget.transferData['recipient'] ?? 'N/A';
-    final type = widget.transferData['type'] ?? 'Unknown';
-    final reason = widget.transferData['reason'] ?? 'Living Expenses';
-    final notes = widget.transferData['notes'] ?? '';
-    final recipientName = widget.transferData['recipientName'] ?? 'Unknown';
+    final recipient = SecurityUtils.sanitizeInput(
+      widget.transferData['recipient']?.toString() ?? 'N/A',
+    );
+    final type = SecurityUtils.sanitizeInput(
+      widget.transferData['type']?.toString() ?? 'Unknown',
+    );
+    final reason = SecurityUtils.sanitizeInput(
+      widget.transferData['reason']?.toString() ?? 'Living Expenses',
+    );
+    final notes = SecurityUtils.sanitizeInput(
+      widget.transferData['notes']?.toString() ?? '',
+    );
+    final recipientName = SecurityUtils.sanitizeInput(
+      widget.transferData['recipientName']?.toString() ?? 'Unknown',
+    );
 
     final session = context.watch<AppSession>();
-    final fromBank = session.selectedBank.isNotEmpty ? session.selectedBank : 'National Bank of Egypt';
-    final fromHandle = session.phoneNumber.isNotEmpty ? '${session.phoneNumber}@instapay' : 'my_account@instapay';
+    final fromBank = session.selectedBank.isNotEmpty
+        ? session.selectedBank
+        : 'National Bank of Egypt';
+    final fromHandle = session.phoneNumber.isNotEmpty
+        ? '${session.phoneNumber}@instapay'
+        : 'my_account@instapay';
 
     return Scaffold(
       body: Container(
@@ -58,19 +73,21 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                 width: 350,
                 height: 350,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF8C42).withOpacity(0.9), // Orange shape
+                  color: const Color(
+                    0xFFFF8C42,
+                  ).withOpacity(0.9), // Orange shape
                   shape: BoxShape.circle,
                 ),
               ),
             ),
-            
+
             SafeArea(
               child: Column(
                 children: [
                   _buildAppBar(context),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Amount Display
                   Text(
                     "$amountStr EGP",
@@ -82,14 +99,11 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                   ),
                   const Text(
                     "Transfer Amount",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Fees Card
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -106,22 +120,55 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                             children: [
                               Row(
                                 children: const [
-                                  Text("Fees", style: TextStyle(color: Colors.white, fontSize: 13)),
+                                  Text(
+                                    "Fees",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                    ),
+                                  ),
                                   SizedBox(width: 6),
-                                  Icon(Icons.info_outline, color: Colors.white, size: 14),
+                                  Icon(
+                                    Icons.info_outline,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
                                 ],
                               ),
-                              Text("$fees EGP", style: const TextStyle(color: Colors.white, fontSize: 13)),
+                              Text(
+                                "$fees EGP",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 12),
-                          Container(height: 1, color: Colors.white.withOpacity(0.2)),
+                          Container(
+                            height: 1,
+                            color: Colors.white.withOpacity(0.2),
+                          ),
                           const SizedBox(height: 12),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text("Total Amount", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                              Text("$total EGP", style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                              const Text(
+                                "Total Amount",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "$total EGP",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -159,7 +206,11 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                               ),
                             ],
                           ),
-                          child: const Icon(Icons.keyboard_double_arrow_down_rounded, color: Color(0xFFFF8C42), size: 20),
+                          child: const Icon(
+                            Icons.keyboard_double_arrow_down_rounded,
+                            color: Color(0xFFFF8C42),
+                            size: 20,
+                          ),
                         ),
                       ],
                     ),
@@ -175,7 +226,10 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                       });
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF8C42).withOpacity(0.6),
                         borderRadius: BorderRadius.circular(12),
@@ -183,9 +237,22 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text("More Details", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                          const Text(
+                            "More Details",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                           const SizedBox(width: 4),
-                          Icon(_showMoreDetails ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: Colors.white, size: 18),
+                          Icon(
+                            _showMoreDetails
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ],
                       ),
                     ),
@@ -194,7 +261,11 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                   // Expanded Details
                   if (_showMoreDetails)
                     Padding(
-                      padding: const EdgeInsets.only(top: 12, left: 24, right: 24),
+                      padding: const EdgeInsets.only(
+                        top: 12,
+                        left: 24,
+                        right: 24,
+                      ),
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -204,22 +275,46 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Text("Reason for Transfer:", style: TextStyle(color: Colors.white70, fontSize: 11)),
-                            Text(reason, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                            const Text(
+                              "Reason for Transfer:",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 11,
+                              ),
+                            ),
+                            Text(
+                              reason,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             const SizedBox(height: 8),
-                            const Text("Notes:", style: TextStyle(color: Colors.white70, fontSize: 11)),
-                            Text(notes.isEmpty ? "No notes added" : notes, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                            const Text(
+                              "Notes:",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 11,
+                              ),
+                            ),
+                            Text(
+                              notes.isEmpty ? "No notes added" : notes,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
 
                   const Spacer(),
-                  
-
 
                   const SizedBox(height: 20),
-                  
+
                   // Bottom Actions
                   Padding(
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
@@ -234,9 +329,15 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                             decoration: BoxDecoration(
                               color: Colors.transparent,
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.5),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.4),
+                                width: 1.5,
+                              ),
                             ),
-                            child: const Icon(Icons.arrow_back, color: Colors.white),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -244,7 +345,9 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
-                              final data = Map<String, dynamic>.from(widget.transferData);
+                              final data = Map<String, dynamic>.from(
+                                widget.transferData,
+                              );
                               data['total'] = total;
                               context.push('/pin_entry', extra: data);
                             },
@@ -258,7 +361,7 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                                     color: Colors.black.withOpacity(0.15),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
-                                  )
+                                  ),
                                 ],
                               ),
                               child: const Center(
@@ -307,16 +410,24 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
                       color: Colors.black.withOpacity(0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
-                    )
+                    ),
                   ],
                 ),
-                child: const Icon(Icons.keyboard_arrow_left, color: Colors.black, size: 24),
+                child: const Icon(
+                  Icons.keyboard_arrow_left,
+                  color: Colors.black,
+                  size: 24,
+                ),
               ),
             ),
           ),
           const Text(
             "Send Money",
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -340,18 +451,41 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.green.shade200),
             ),
-            child: Icon(Icons.account_balance, color: Colors.green.shade700, size: 24),
+            child: Icon(
+              Icons.account_balance,
+              color: Colors.green.shade700,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("From", style: TextStyle(fontSize: 11, color: Colors.grey)),
+                const Text(
+                  "From",
+                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                ),
                 const SizedBox(height: 2),
-                Text(handle, style: const TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  handle,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 2),
-                Text(bankName, style: const TextStyle(fontSize: 11, color: Colors.grey, letterSpacing: 0.5)),
+                Text(
+                  bankName,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ],
             ),
           ),
@@ -393,11 +527,30 @@ class _SendConfirmationViewState extends State<SendConfirmationView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(type == 'Wallet' ? 'To Wallet' : 'To Instapay', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                Text(
+                  type == 'Wallet' ? 'To Wallet' : 'To Instapay',
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
                 const SizedBox(height: 2),
-                Text(recipientName, style: const TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  recipientName,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 2),
-                Text(recipient, style: const TextStyle(fontSize: 12, color: Colors.black87, fontWeight: FontWeight.w500)),
+                Text(
+                  recipient,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),

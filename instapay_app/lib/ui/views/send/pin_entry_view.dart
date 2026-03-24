@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/session/app_session.dart';
+import '../../../core/security/security_utils.dart';
+import '../auth/biometric_view.dart';
 import 'pin_entry_viewmodel.dart';
 
 class PinEntryView extends StatelessWidget {
@@ -28,7 +30,9 @@ class _PinEntryBody extends StatelessWidget {
     final vm = context.watch<PinEntryViewModel>();
     final session = context.watch<AppSession>();
     final totalAmount = transferData['total'] ?? 0.0;
-    final fromBank = session.selectedBank.isNotEmpty ? session.selectedBank : 'National Bank of Egypt';
+    final fromBank = session.selectedBank.isNotEmpty
+        ? session.selectedBank
+        : 'National Bank of Egypt';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -42,25 +46,39 @@ class _PinEntryBody extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () => context.pop(),
-                    child: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.black87,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
                       fromBank,
-                      style: const TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   // Fake IPN Logo
                   const Text(
                     "IPN",
-                    style: TextStyle(color: Color(0xFF6F00FF), fontWeight: FontWeight.w900, fontStyle: FontStyle.italic, fontSize: 24, letterSpacing: -1),
+                    style: TextStyle(
+                      color: Color(0xFF6F00FF),
+                      fontWeight: FontWeight.w900,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 24,
+                      letterSpacing: -1,
+                    ),
                   ),
                 ],
               ),
             ),
             const Divider(height: 1, color: Color(0xFFE0E0E0)),
-            
+
             // Account Info Subheader
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -70,22 +88,61 @@ class _PinEntryBody extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
-                      Text("Account Info", style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                      Text(
+                        "Account Info",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       SizedBox(height: 2),
-                      Text("XXXXX0180", style: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w700)),
-                      Text("SAVING", style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                      Text(
+                        "XXXXX0180",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        "SAVING",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text("Total Amount", style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                      const Text(
+                        "Total Amount",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          Text("$totalAmount EGP", style: const TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w700)),
+                          Text(
+                            "$totalAmount EGP",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           const SizedBox(width: 4),
-                          const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 18),
+                          const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.grey,
+                            size: 18,
+                          ),
                         ],
                       ),
                     ],
@@ -94,7 +151,7 @@ class _PinEntryBody extends StatelessWidget {
               ),
             ),
             const Divider(height: 1, color: Color(0xFFE0E0E0)),
-            
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -104,16 +161,35 @@ class _PinEntryBody extends StatelessWidget {
                     if (vm.error != null)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(vm.error!, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          vm.error!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                      
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Enter IPN PIN", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black)),
+                        const Text(
+                          "Enter IPN PIN",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        ),
                         GestureDetector(
                           onTap: vm.toggleVisibility,
-                          child: Icon(vm.obscurePin ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: Colors.grey, size: 20),
+                          child: Icon(
+                            vm.obscurePin
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: Colors.grey,
+                            size: 20,
+                          ),
                         ),
                       ],
                     ),
@@ -126,14 +202,23 @@ class _PinEntryBody extends StatelessWidget {
                           width: 45,
                           height: 50,
                           decoration: BoxDecoration(
-                            border: Border.all(color: hasValue ? const Color(0xFF6F00FF) : Colors.grey.shade400, width: hasValue ? 2 : 1),
+                            border: Border.all(
+                              color: hasValue
+                                  ? const Color(0xFF6F00FF)
+                                  : Colors.grey.shade400,
+                              width: hasValue ? 2 : 1,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Center(
                             child: hasValue
                                 ? Text(
                                     vm.obscurePin ? '•' : vm.pin[index],
-                                    style: TextStyle(fontSize: vm.obscurePin ? 28 : 22, fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(
+                                      fontSize: vm.obscurePin ? 28 : 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
                                   )
                                 : null,
                           ),
@@ -144,7 +229,7 @@ class _PinEntryBody extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Numpad Area
             if (vm.isLoading)
               const Padding(
@@ -170,7 +255,11 @@ class _PinEntryBody extends StatelessWidget {
     );
   }
 
-  Widget _buildNumpadRow(List<String> keys, PinEntryViewModel vm, [BuildContext? context]) {
+  Widget _buildNumpadRow(
+    List<String> keys,
+    PinEntryViewModel vm, [
+    BuildContext? context,
+  ]) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: keys.map((k) {
@@ -186,7 +275,20 @@ class _PinEntryBody extends StatelessWidget {
                   } else if (k == 'ENTER' && context != null) {
                     final success = await vm.verify();
                     if (success) {
-                      context.push('/transfer_success', extra: transferData);
+                      final totalAmount =
+                          (transferData['total'] as num?)?.toDouble() ?? 0.0;
+                      if (SecurityUtils.isHighRisk(totalAmount)) {
+                        // Additional biometric validation for high-risk transactions
+                        context.push(
+                          '/biometric',
+                          extra: {
+                            'nextRoute': '/transfer_success',
+                            'nextData': transferData,
+                          },
+                        );
+                      } else {
+                        context.push('/transfer_success', extra: transferData);
+                      }
                     }
                   } else if (k != 'ENTER' && k != '<') {
                     vm.addDigit(k);
@@ -194,10 +296,28 @@ class _PinEntryBody extends StatelessWidget {
                 },
                 child: Center(
                   child: k == 'ENTER'
-                      ? const Text("ENTER", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black))
+                      ? const Text(
+                          "ENTER",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        )
                       : k == '<'
-                          ? const Icon(Icons.backspace_outlined, size: 24, color: Colors.black)
-                          : Text(k, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black)),
+                      ? const Icon(
+                          Icons.backspace_outlined,
+                          size: 24,
+                          color: Colors.black,
+                        )
+                      : Text(
+                          k,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        ),
                 ),
               ),
             ),

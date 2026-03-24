@@ -18,22 +18,86 @@ class TransferSuccessView extends StatelessWidget {
   }
 }
 
-class _TransferSuccessBody extends StatelessWidget {
+class _TransferSuccessBody extends StatefulWidget {
   final Map<String, dynamic> transferData;
 
   const _TransferSuccessBody({required this.transferData});
 
   @override
+  State<_TransferSuccessBody> createState() => _TransferSuccessBodyState();
+}
+
+class _TransferSuccessBodyState extends State<_TransferSuccessBody> {
+  bool _hasSavedTransaction = false;
+
+  String _formatToday() {
+    final now = DateTime.now();
+    final monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final hour = now.hour % 12 == 0 ? 12 : now.hour % 12;
+    final minute = now.minute.toString().padLeft(2, '0');
+    final ampm = now.hour >= 12 ? 'PM' : 'AM';
+    return '${now.day.toString().padLeft(2, '0')} ${monthNames[now.month - 1]} ${now.year} ${hour.toString().padLeft(2, '0')}:$minute $ampm';
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_hasSavedTransaction) {
+      final session = context.read<AppSession>();
+      final transferData = widget.transferData;
+      final amountValue = transferData['amount']?.toString() ?? '0';
+      final amountLabel = amountValue.endsWith('EGP')
+          ? amountValue
+          : '$amountValue EGP';
+      final recipient = transferData['recipient']?.toString() ?? 'Unknown';
+      final recipientName =
+          transferData['recipientName']?.toString() ?? 'Unknown';
+      final type = transferData['type']?.toString() ?? 'Send Money';
+
+      session.addTransaction(
+        amount: amountLabel,
+        name: recipient,
+        maskedName: recipientName,
+        type: type == 'Send Money' || type == 'Received Money'
+            ? type
+            : 'Send Money',
+        status: 'Successful',
+        date: _formatToday(),
+      );
+
+      _hasSavedTransaction = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final vm = context.watch<TransferSuccessViewModel>();
     final session = context.watch<AppSession>();
-    final amount = transferData['amount']?.toString() ?? '0.00';
-    final recipient = transferData['recipient'] ?? 'N/A';
-    final recipientName = transferData['recipientName'] ?? 'Unknown';
-    final type = transferData['type'] ?? 'Unknown';
+    final amount = widget.transferData['amount']?.toString() ?? '0.00';
+    final recipient = widget.transferData['recipient'] ?? 'N/A';
+    final recipientName = widget.transferData['recipientName'] ?? 'Unknown';
+    final type = widget.transferData['type'] ?? 'Unknown';
 
-    final fromBank = session.selectedBank.isNotEmpty ? session.selectedBank : 'National Bank of Egypt';
-    final fromHandle = session.phoneNumber.isNotEmpty ? '${session.phoneNumber}@instapay' : 'my_account@instapay';
+    final fromBank = session.selectedBank.isNotEmpty
+        ? session.selectedBank
+        : 'National Bank of Egypt';
+    final fromHandle = session.phoneNumber.isNotEmpty
+        ? '${session.phoneNumber}@instapay'
+        : 'my_account@instapay';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFC), // very faint blue-ish white
@@ -58,18 +122,26 @@ class _TransferSuccessBody extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.grey.shade200),
                         ),
-                        child: const Icon(Icons.keyboard_arrow_left, color: Colors.black, size: 24),
+                        child: const Icon(
+                          Icons.keyboard_arrow_left,
+                          color: Colors.black,
+                          size: 24,
+                        ),
                       ),
                     ),
                   ),
                   const Text(
                     "Approved Transaction",
-                    style: TextStyle(color: Color(0xFF1B2C41), fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: Color(0xFF1B2C41),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
             ),
-            
+
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -83,12 +155,23 @@ class _TransferSuccessBody extends StatelessWidget {
                         alignment: Alignment.center,
                         children: [
                           Positioned(
-                            top: 20, right: 80,
-                            child: CircleAvatar(radius: 8, backgroundColor: Colors.greenAccent.withOpacity(0.5)),
+                            top: 20,
+                            right: 80,
+                            child: CircleAvatar(
+                              radius: 8,
+                              backgroundColor: Colors.greenAccent.withOpacity(
+                                0.5,
+                              ),
+                            ),
                           ),
                           Positioned(
-                            bottom: 20, left: 90,
-                            child: CircleAvatar(radius: 12, backgroundColor: Colors.green.shade400.withOpacity(0.6)),
+                            bottom: 20,
+                            left: 90,
+                            child: CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Colors.green.shade400
+                                  .withOpacity(0.6),
+                            ),
                           ),
                           Container(
                             width: 120,
@@ -101,11 +184,15 @@ class _TransferSuccessBody extends StatelessWidget {
                                   color: Colors.greenAccent.withOpacity(0.3),
                                   blurRadius: 30,
                                   spreadRadius: 10,
-                                )
+                                ),
                               ],
                             ),
                             child: const Center(
-                              child: Icon(Icons.check_rounded, color: Colors.greenAccent, size: 80),
+                              child: Icon(
+                                Icons.check_rounded,
+                                color: Colors.greenAccent,
+                                size: 80,
+                              ),
                             ),
                           ),
                         ],
@@ -113,22 +200,47 @@ class _TransferSuccessBody extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 10),
-                    const Text("Your transaction was successful", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF1B2C41))),
-                    
+                    const Text(
+                      "Your transaction was successful",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF1B2C41),
+                      ),
+                    ),
+
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(amount, style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.black, height: 1)),
+                        Text(
+                          amount,
+                          style: const TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            height: 1,
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         const Padding(
                           padding: EdgeInsets.only(bottom: 6),
-                          child: Text("EGP", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color(0xFFFF8C42))),
+                          child: Text(
+                            "EGP",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFF8C42),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const Text("Transfer Amount", style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    const Text(
+                      "Transfer Amount",
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
 
                     const SizedBox(height: 24),
 
@@ -140,7 +252,11 @@ class _TransferSuccessBody extends StatelessWidget {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 15, offset: const Offset(0, 5)),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
                           ],
                         ),
                         child: Stack(
@@ -149,8 +265,16 @@ class _TransferSuccessBody extends StatelessWidget {
                             Column(
                               children: [
                                 _buildFromSection(fromBank, fromHandle),
-                                Container(height: 1, color: Colors.grey.shade100),
-                                _buildToSection(recipient, type, recipientName, vm),
+                                Container(
+                                  height: 1,
+                                  color: Colors.grey.shade100,
+                                ),
+                                _buildToSection(
+                                  recipient,
+                                  type,
+                                  recipientName,
+                                  vm,
+                                ),
                               ],
                             ),
                             // Green check badge divider
@@ -166,9 +290,15 @@ class _TransferSuccessBody extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: Colors.green.shade50,
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.green.shade200),
+                                  border: Border.all(
+                                    color: Colors.green.shade200,
+                                  ),
                                 ),
-                                child: Icon(Icons.check, color: Colors.green.shade600, size: 16),
+                                child: Icon(
+                                  Icons.check,
+                                  color: Colors.green.shade600,
+                                  size: 16,
+                                ),
                               ),
                             ),
                           ],
@@ -182,9 +312,20 @@ class _TransferSuccessBody extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("More Details", style: TextStyle(color: Color(0xFFFF8C42), fontSize: 13, fontWeight: FontWeight.w600)),
+                        const Text(
+                          "More Details",
+                          style: TextStyle(
+                            color: Color(0xFFFF8C42),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.keyboard_arrow_down, color: Color(0xFFFF8C42), size: 18),
+                        const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Color(0xFFFF8C42),
+                          size: 18,
+                        ),
                       ],
                     ),
 
@@ -192,18 +333,29 @@ class _TransferSuccessBody extends StatelessWidget {
 
                     const Text(
                       "POWERED BY",
-                      style: TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.w600, letterSpacing: 1),
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1,
+                      ),
                     ),
                     const Text(
                       "IPN",
-                      style: TextStyle(fontSize: 24, color: Color(0xFF6F00FF), fontWeight: FontWeight.w900, fontStyle: FontStyle.italic, height: 1),
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Color(0xFF6F00FF),
+                        fontWeight: FontWeight.w900,
+                        fontStyle: FontStyle.italic,
+                        height: 1,
+                      ),
                     ),
                     const SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
-            
+
             // Bottom Actions
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 10, 24, 20),
@@ -217,10 +369,13 @@ class _TransferSuccessBody extends StatelessWidget {
                       color: const Color(0xFF6F00FF).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(Icons.ios_share_outlined, color: Color(0xFF6F00FF)),
+                    child: const Icon(
+                      Icons.ios_share_outlined,
+                      color: Color(0xFF6F00FF),
+                    ),
                   ),
                   const SizedBox(width: 16),
-                  
+
                   // Home Button
                   Expanded(
                     child: GestureDetector(
@@ -237,7 +392,11 @@ class _TransferSuccessBody extends StatelessWidget {
                         child: const Center(
                           child: Text(
                             "Home",
-                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
@@ -265,18 +424,41 @@ class _TransferSuccessBody extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Colors.green.shade100),
             ),
-            child: Icon(Icons.account_balance, color: Colors.green.shade700, size: 24),
+            child: Icon(
+              Icons.account_balance,
+              color: Colors.green.shade700,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("From", style: TextStyle(fontSize: 11, color: Colors.grey)),
+                const Text(
+                  "From",
+                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                ),
                 const SizedBox(height: 2),
-                Text(handle, style: const TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  handle,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 2),
-                Text(bankName, style: const TextStyle(fontSize: 11, color: Colors.grey, letterSpacing: 0.5)),
+                Text(
+                  bankName,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ],
             ),
           ),
@@ -285,7 +467,12 @@ class _TransferSuccessBody extends StatelessWidget {
     );
   }
 
-  Widget _buildToSection(String recipient, String type, String recipientName, TransferSuccessViewModel vm) {
+  Widget _buildToSection(
+    String recipient,
+    String type,
+    String recipientName,
+    TransferSuccessViewModel vm,
+  ) {
     IconData iconData = Icons.phone_iphone;
     Color iconColor = const Color(0xFFFF8C42);
     Color bgColor = const Color(0xFFFF8C42).withOpacity(0.15);
@@ -314,11 +501,30 @@ class _TransferSuccessBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(type == 'Wallet' ? 'To Wallet' : 'To Instapay', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                Text(
+                  type == 'Wallet' ? 'To Wallet' : 'To Instapay',
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                ),
                 const SizedBox(height: 2),
-                Text(recipientName, style: const TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  recipientName,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 2),
-                Text(recipient, style: const TextStyle(fontSize: 12, color: Colors.black87, fontWeight: FontWeight.w500)),
+                Text(
+                  recipient,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -327,8 +533,8 @@ class _TransferSuccessBody extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(
-                vm.isFavorite ? Icons.star_rounded : Icons.star_border_rounded, 
-                color: const Color(0xFFFF8C42), 
+                vm.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                color: const Color(0xFFFF8C42),
                 size: 28,
               ),
             ),
