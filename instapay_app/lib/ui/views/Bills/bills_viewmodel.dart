@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BillCategory {
   final String title;
@@ -12,18 +13,22 @@ class BillCategory {
   });
 }
 
-class BillsViewModel {
+class BillsViewModel extends ChangeNotifier {
+  int selectedTab = 0; // 0 = Recent/Categories, 1 = My Bills
 
-  /// These will later come from backend
-  bool hasRecentTransactions = false;
-  bool hasBills = false;
+  void setTab(int index) {
+    selectedTab = index;
+    notifyListeners();
+  }
 
   List<BillCategory> getCategories(BuildContext context) {
     return [
       BillCategory(
         title: "Telecom & Internet Bills",
         icon: Icons.phone_in_talk_outlined,
-        onTap: () {},
+        onTap: () {
+          context.push('/telecom_bills');
+        },
       ),
       BillCategory(
         title: "Telecom & Internet Recharge",
@@ -56,26 +61,5 @@ class BillsViewModel {
         onTap: () {},
       ),
     ];
-  }
-
-  /// Snackbars logic
-  void onRecentPressed(BuildContext context) {
-    if (!hasRecentTransactions) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("No transactions found"),
-        ),
-      );
-    }
-  }
-
-  void onMyBillsPressed(BuildContext context) {
-    if (!hasBills) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("No bills added yet"),
-        ),
-      );
-    }
   }
 }

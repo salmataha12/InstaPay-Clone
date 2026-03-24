@@ -14,7 +14,7 @@ class SignupViewModel extends ChangeNotifier {
 
   /// Update phone number
   void updatePhone(String value) {
-    phoneNumber = value.trim();
+    phoneNumber = value.replaceAll(RegExp(r'[^\d]'), '');
   }
 
   /// Egyptian number validation

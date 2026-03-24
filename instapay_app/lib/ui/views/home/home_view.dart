@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'home_viewmodel.dart';
+import '../../widgets/transaction_tile.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -27,79 +29,126 @@ class _HomeBody extends StatelessWidget {
         child: Column(
           children: [
 
-            /// HEADER (UNCHANGED)
-            Container(
+            /// HEADER — exact same style as Send Money
+            SizedBox(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF7B2FF7),
-                    Color(0xFF5A2D82),
-                  ],
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              height: 160,
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        vm.getGreeting(),
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        vm.userName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundColor: Colors.white24,
-                        child: Icon(Icons.history, color: Colors.white),
-                      ),
-                      const SizedBox(width: 10),
-                      Stack(
-                        children: [
-                          const CircleAvatar(
-                            backgroundColor: Colors.white24,
-                            child: Icon(Icons.notifications, color: Colors.white),
-                          ),
-                          Positioned(
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Colors.orange,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Text(
-                                "8",
-                                style: TextStyle(fontSize: 10, color: Colors.white),
-                              ),
-                            ),
-                          )
+                  // Purple gradient — identical to SendView
+                  Container(
+                    width: double.infinity,
+                    height: 160,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF7B2FF7),
+                          Color(0xFF9B59F5),
+                          Color(0xFFB06EF8),
                         ],
                       ),
-                    ],
-                  )
+                      borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+                    ),
+                  ),
+                  // Large orange circle — top-RIGHT (same as SendView)
+                  Positioned(
+                    top: -30,
+                    right: -20,
+                    child: Container(
+                      width: 160,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF6B35).withOpacity(0.75),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                  // Smaller orange circle — right inset (same as SendView)
+                  Positioned(
+                    top: -10,
+                    right: 60,
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF8C42).withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                  // Content overlay (greeting + icons)
+                  Positioned.fill(
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  vm.getGreeting(),
+                                  style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  vm.userName,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => context.push('/transactions'),
+                                  child: const CircleAvatar(
+                                    backgroundColor: Colors.white24,
+                                    child: Icon(Icons.history, color: Colors.white),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Stack(
+                                  children: [
+                                    const CircleAvatar(
+                                      backgroundColor: Colors.white24,
+                                      child: Icon(Icons.notifications, color: Colors.white),
+                                    ),
+                                    Positioned(
+                                      right: 0,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.orange,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Text(
+                                          "8",
+                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
+
 
             const SizedBox(height: 20),
 
@@ -148,7 +197,7 @@ class _HomeBody extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            /// ACCOUNT CARD (IMPROVED)
+            /// ACCOUNT CARD
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(15),
@@ -192,7 +241,7 @@ class _HomeBody extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            /// 🔸 DOT
+            ///  DOT
             Container(
               width: 6,
               height: 6,
@@ -233,20 +282,33 @@ class _HomeBody extends StatelessWidget {
               itemBuilder: (context, index) {
                 final service = vm.services[index];
 
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(0, 1),
-                        blurRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Column(
+                return GestureDetector(
+                  onTap: () {
+                    final title = service["title"];
+                    if (title == "Send Money") {
+                      context.push('/send');
+                    } else if (title == "Collect Money") {
+                      context.push('/collect');
+                    } else if (title == "Bill Payment") {
+                      context.push('/bills');
+                    } else if (title == "Transactions History") {
+                      context.push('/transactions');
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0, 1),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Column(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -264,7 +326,8 @@ class _HomeBody extends StatelessWidget {
                       ),
                     ],
                   ),
-                );
+                  ), 
+                ); 
               },
             ),
 
@@ -275,16 +338,19 @@ class _HomeBody extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("Last Transactions"),
-                  Text("View All", style: TextStyle(color: Colors.orange)),
+                children: [
+                  const Text("Last Transactions"),
+                  GestureDetector(
+                    onTap: () => context.push('/transactions'),
+                    child: const Text("View All", style: TextStyle(color: Colors.orange)),
+                  ),
                 ],
               ),
             ),
 
             const SizedBox(height: 10),
 
-            /// TRANSACTIONS LIST (IMPROVED STYLE)
+            /// TRANSACTIONS LIST 
             ListView.builder(
               itemCount: vm.transactions.length,
               shrinkWrap: true,
@@ -294,40 +360,7 @@ class _HomeBody extends StatelessWidget {
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tx["amount"]),
-                            const SizedBox(height: 3),
-                            Text(
-                              tx["name"],
-                              style: const TextStyle(color: Colors.grey, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade100,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            tx["status"],
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: TransactionTile(tx: tx, showBackground: true),
                 );
               },
             ),

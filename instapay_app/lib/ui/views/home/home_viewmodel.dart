@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class HomeViewModel extends ChangeNotifier {
 
   /// USER DATA (mock now → backend later)
-  String userName = "Hanan Elsayed";
-  String account = "hanan_elsayed2710@instapay";
+  String userName = "Salma Taha";
+  String account = "salmataha12@instapay";
   String accountType = "SAVING XXXXX180";
 
   /// GREETING BASED ON TIME
@@ -35,21 +35,27 @@ class HomeViewModel extends ChangeNotifier {
   /// TRANSACTIONS (mock)
   final List<Map<String, dynamic>> transactions = [
     {
-      "amount": "580 EGP",
-      "name": "mernatah178@instapay",
+      "amount": "50 EGP",
+      "name": "mernataha178@instapay",
+      "maskedName": "ميرنا طه عبدالعليم العرابي حماد",
       "type": "Received Money",
+      "date": "19 Mar 2026 03:34 AM",
       "status": "Successful"
     },
     {
-      "amount": "70 EGP",
-      "name": "01028973355",
+      "amount": "650 EGP",
+      "name": "Rana Amr",
+      "maskedName": "Rana Amr",
       "type": "Send Money",
+      "date": "19 Mar 2026 03:19 AM",
       "status": "Successful"
     },
     {
-      "amount": "262 EGP",
-      "name": "Electricity Bill",
-      "type": "Bill Payment",
+      "amount": "225 EGP",
+      "name": "Nada ashraf ",
+      "maskedName": "Nada ashraf ",
+      "type": "Send Money",
+      "date": "19 Mar 2026 03:14 AM",
       "status": "Successful"
     },
   ];

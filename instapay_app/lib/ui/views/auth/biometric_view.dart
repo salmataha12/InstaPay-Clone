@@ -78,13 +78,36 @@ class _BiometricBody extends StatelessWidget {
 
             const Spacer(),
 
-            /// OPTIONAL MESSAGE
+            /// FALLBACK PIN INPUT
             if (!vm.isBiometricAvailable)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 10),
-                child: Text(
-                  "Biometric not available (emulator mode)",
-                  style: TextStyle(color: Colors.grey),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Biometric not available. Please enter your 6-digit PIN:",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      maxLength: 6,
+                      decoration: InputDecoration(
+                        hintText: "Enter PIN",
+                        filled: true,
+                        fillColor: Colors.white,
+                        errorText: vm.errorMsg,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        vm.updatePin(value);
+                      },
+                    ),
+                  ],
                 ),
               ),
 
@@ -100,7 +123,7 @@ class _BiometricBody extends StatelessWidget {
 
                         if (success) {
                           context.go('/bank');
-                        } else {
+                        } else if (vm.errorMsg == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("Authentication failed"),

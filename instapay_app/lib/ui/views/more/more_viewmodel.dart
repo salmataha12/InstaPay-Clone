@@ -78,15 +78,12 @@ class MoreViewModel {
   /// 🔒 FULL SECURE LOGOUT (FRONTEND SECURITY IMPLEMENTATION)
   Future<void> _secureLogout(BuildContext context) async {
     try {
-      /// 1. Clear secure storage (JWT, tokens, sensitive data)
-      await _secureStorage.deleteAll();
-
-      /// 2. Clear in-memory session (VERY IMPORTANT)
+      /// 1. Clear session fully (JWT, tokens, sensitive data in-memory)
       final session = Provider.of<AppSession>(context, listen: false);
-      session.clear();
+      await session.logout();
 
-      /// 3. Navigate to login & remove all previous routes
-      context.go('/login');
+      /// 2. Navigate out safely
+      context.go('/signup');
 
     } catch (e) {
       debugPrint("Logout Error: $e");

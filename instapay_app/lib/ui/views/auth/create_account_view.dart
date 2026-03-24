@@ -91,6 +91,29 @@ class _CreateAccountBody extends StatelessWidget {
                       vm.updateName(value);
                     },
                   ),
+
+                  const SizedBox(height: 20),
+
+                  const Text("Create a 6-digit PIN"),
+
+                  const SizedBox(height: 8),
+
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    obscureText: true,
+                    maxLength: 6,
+                    decoration: InputDecoration(
+                      hintText: "Enter 6-digit PIN",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      vm.updatePin(value);
+                    },
+                  ),
                 ],
               ),
             ),
